@@ -20,11 +20,8 @@ def server(client_ip):
     if client_ip:
         thread.start_new_thread(client, (client_ip,))
     s = socket.socket()
-    host = socket.gethostname()
-    #host = '192.168.10.33'
-    print('Listening at ' + host)
     port = 12345
-    s.bind((host, port))
+    s.bind(('', port))
 
     s.listen(5)
     c, addr = s.accept()
