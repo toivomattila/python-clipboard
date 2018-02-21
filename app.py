@@ -4,10 +4,16 @@ import time
 import thread
 import sys
 
-def client(host):
+client_ip = ''
+
+def client():
+    #If client_ip is empty, wait for server to give the ip
+    while not client_ip:
+        time.sleep(1)
     s = socket.socket()
     port = 12345
-    s.connect((host, port))
+    s.connect((client_ip, port))
+    print("Listening to " + client_ip)
     while True:
         data = s.recv(65536)
         if(data != pyperclip.paste() and data != ""):
@@ -15,19 +21,16 @@ def client(host):
         time.sleep(1)
     s.close
 
-def server(client_ip):
-    #client
-    if client_ip:
-        thread.start_new_thread(client, (client_ip,))
+def server():
+    global client_ip
     s = socket.socket()
     port = 12345
     s.bind(('', port))
 
     s.listen(5)
     c, addr = s.accept()
-    #client
-    if not client_ip:
-        thread.start_new_thread(client, (addr[0],))
+    print("Sending to " + addr[0])
+    client_ip = addr[0]
     clipboard = ""
     while True:
         if(clipboard != pyperclip.paste()):
@@ -36,7 +39,7 @@ def server(client_ip):
         time.sleep(1)
     c.close()
 
-client_ip = ''
 if len(sys.argv) == 2:
     client_ip = sys.argv[1]
-server(client_ip)
+thread.start_new_thread(client, ())
+server()
